@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+{% form_theme formPost 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+<h1>Creation d'un post</h1>
+    {{ form_start(formPost) }}
+
+       {{ form_row(formPost.title,{'attr':{'placeholder':'Titre du post'}}) }}
+       {{ form_row(formPost.content,{'attr':{'placeholder':'Titre du contenu'}}) }}
+<button type="submit" class="btn btn-success">
+    {% if is_granted('ROLE_ADMIN') %}
+        {% if editMode %}
+        Enregister les modifications
+        {% else %}
+        Ajouter l'article
+        {% endif %}
+    {% else %}
+        Ajouter l'article
+    {% endif %}
+
+</button>
+    {{  form_end(formPost)}}
+{% endblock %}

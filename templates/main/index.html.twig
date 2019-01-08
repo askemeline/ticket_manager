@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {{ controller_name }}!{% endblock %}
+
+{% block body %}
+{#<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>#}
+
+<div class="">
+    {% if app.user  %}
+{#
+        <h1>Hello {{ app.user.username }}</h1>
+#}
+        <div class="my-3 p-3 bg-white rounded box-shadow">
+            {% for users in user %}
+               {{ users.username }}
+            {% endfor %}
+            {% for article in articles %}
+               {{ article.title }}
+            {% endfor %}
+
+
+            <h6 class="border-bottom border-gray pb-2 mb-0">Recent tickets</h6>
+            {% for article in articles %}
+            <div class="media text-muted pt-3">
+                <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+
+
+                        <div><h4><a href="{{ path('post_show',{'id':article.id}) }}">{{ article.title }}</a></h4>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('edit_post',{'id':article.id}) }}">
+                                <i class="fas fa-edit"></i></a>
+                                <a href="{{ path('delete_article',{'id':article.id}) }}"><i class="far fa-trash-alt"></i></a>
+                            {% endif %}
+                        </div>
+                    {#<div>{{ article.content | raw}}</div>#}
+                    <div><small>Ecrit le {{ article.createdAt | date('d/m/Y') }}  à {{ article.createdAt | date('H:i') }} par {{ article.user.username}}</small></div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+    {#{% else %}
+        <h1>Hello anonymous</h1>
+    {% endif %}#}
+
+
+{% endblock %}
