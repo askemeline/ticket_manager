@@ -21,65 +21,68 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class MainController extends AbstractController
 {
+
+    /**
+     *
+     * @Security("has_role('ROLE_ADMIN')")
+     * @Route("share/{id}/{user}", name="share", requirements={"id":"\d+"})
+     */
+    public function share(Article $article, User $user) {
+
+        $manager = $this->getDoctrine()->getManager();
+        $user=$this->getUser();
+       /* dump($user);*/
+        $article =$user->getId();
+        $collabore = $user->setUser();
+        dump($collabore);
+        $id=$user->getId();
+        $manager->persist($collabore);
+        $manager->flush();
+        return $this->redirectToRoute('main',[
+
+                'user'=>$id,
+               'id' =>$article,
+               ]
+        );
+    }
+
     /**
      * @Route("/", name="main")
      */
     public function index(ArticleRepository $repo,UserRepository $repuser)
-        /*    public function index()*/
     {
-        /*        $repo = $this->getDoctrine()->getRepository(Article::class);
-                $repuser = $this->getDoctrine()->getRepository(User::class);*/
-
-
         if ($this->isGranted('ROLE_ADMIN')){
             $articles = $repo->findAll();
             $user = $repuser->findAll();
             dump($user);
             return $this->render('main/index.html.twig', [
-                'controller_name' => 'MainController',
+
                 'articles' => $articles,
                 'user'=>$user,
-                /* dump($articles),*/
-                /*     dump($articles2)*/
-
             ]);
         }
         else{
             $user = $this -> getUser();
             $sess =  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-            //TODO
-            //pas tout a fais compris
             if(!$sess){
                 $articles = $user->getArticles();
             }else{
                 return $this->render('main/index.html.twig');
             }
 
-            /* dump($articles);*/
             return $this->render('main/index.html.twig', [
                 'controller_name' => 'MainController',
                 'articles' => $articles,
                 'user'=>$user,
-                /* dump($articles),*/
-                /*     dump($articles2)*/
 
             ]);
-
-            /* dump($articles),*/
-            /*     dump($articles2)*/
-
-
         }
-
     }
     /**
      * @Route("/{id}", name="post_show", requirements={"id":"\d+"})
+     *
      */
     public function  show(Article $article, Request $request,ObjectManager $manager){
-        /*        $user = $repuser->findAll();*/
-        /*     $sess =  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-             if(!$sess){}*/
         $comment = new Comment();
         $user = $this -> getUser();
         $form =$this->createForm(CommentType::class, $comment);
@@ -93,30 +96,11 @@ class MainController extends AbstractController
             $manager->flush();
             dump($comment);
             return $this->redirectToRoute('post_show',['id'=>$article->getId()]);
-
-            /*   if($comment){
-                   if($this -> isGranted('ROLE_USER') && $comment -> getUsers() -> getId() != $user -> getId() ){
-                       return $this->redirectToRoute('show_article', array('id' => $id));
-                   }else{
-                       $em = $this->getDoctrine()->getEntityManager();
-                       $em->remove($comment);
-                       $em->flush();
-                       return $this->redirectToRoute('show_article', array('id' => $article_id));
-                   }
-               }*/
-
         }
-
 
         return $this->render('main/show.html.twig',[
             'article'=>$article,
             'commentForm'=>$form->createView(),
-            /*    'user'=>$user,*/
-            dump($user),
-            dump($article)
-
-            /*dump($article)*/
-            /*'user'=>$user,*/
         ]);
     }
 
@@ -124,12 +108,9 @@ class MainController extends AbstractController
      * @Route("/new", name="post_new")
      *
      * @Route("edit/{id}", name="edit_post")
-     * @Security("has_role('ROLE_ADMIN')")
      */
     public function form(Article $article=null,Request $request, ObjectManager $manager){
         $user = $this -> getUser();
-        /*$user = $this->getUser();
-        $article =  $this->getDoctrine()->getRepository(Article::class) -> findById($id);*/
 
         if(!$article){
             $article = new Article();
@@ -149,7 +130,6 @@ class MainController extends AbstractController
             return $this->redirectToRoute('post_show',['id' => $article->getId()]);
         }
         if ($this->isGranted('ROLE_USER')){
-
             return $this->render('main/create.html.twig',[
                 'formPost'=>$form->createView(),
                 'editMode'=>$article->getId() !==null
@@ -158,9 +138,7 @@ class MainController extends AbstractController
             return $this->render('main/create.html.twig',[
                 'formPost'=>$form->createView()
             ]);
-            /* throw $this->createNotFoundException('The product does not exist');*/
         }
-
     }
     /**
      *
@@ -169,17 +147,19 @@ class MainController extends AbstractController
      */
     public function deleteTicket(Article $article) {
         $manager = $this->getDoctrine()->getManager();
-        /*
-                foreach ($article->getComments() as $comment) {
-                    $manager->remove($comment);
-                }*/
         $manager->remove($article);
         $manager->flush();
-
-
         return $this->redirectToRoute('main',['id' => $article->getId()]);
     }
-
-
-
+    /**
+     *
+     * @Security("has_role('ROLE_ADMIN')")
+     * @Route("deleteComment/{id}", name="delete_comment")
+     */
+    public function deleteComment(Comment $comment) {
+        $manager = $this->getDoctrine()->getManager();
+        $manager->remove($comment);
+        $manager->flush();
+        return $this->redirectToRoute('main',['id' => $comment->getId()]);
+    }
 }

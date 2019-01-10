@@ -2,9 +2,12 @@
 {% form_theme formPost 'bootstrap_4_layout.html.twig' %}
 
 {% block body %}
+    {% if editMode %}
+        <h1>Edit d'un post</h1>
+    {% else %}
 <h1>Creation d'un post</h1>
+    {% endif %}
     {{ form_start(formPost) }}
-
        {{ form_row(formPost.title,{'attr':{'placeholder':'Titre du post'}}) }}
        {{ form_row(formPost.content,{'attr':{'placeholder':'Titre du contenu'}}) }}
 <button type="submit" class="btn btn-success">
