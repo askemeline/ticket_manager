@@ -56,7 +56,6 @@ class MainController extends AbstractController
             $user = $repuser->findAll();
             dump($user);
             return $this->render('main/index.html.twig', [
-
                 'articles' => $articles,
                 'user'=>$user,
             ]);
@@ -74,7 +73,6 @@ class MainController extends AbstractController
                 'controller_name' => 'MainController',
                 'articles' => $articles,
                 'user'=>$user,
-
             ]);
         }
     }

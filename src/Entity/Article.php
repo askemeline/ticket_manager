@@ -46,9 +46,15 @@ class Article
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="collaborator")
+     */
+    private $collaborator;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->collaborator = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -130,6 +136,32 @@ class Article
             if ($comment->getArticle() === $this) {
                 $comment->setArticle(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getCollaborator(): Collection
+    {
+        return $this->collaborator;
+    }
+
+    public function addCollaborator(User $collaborator): self
+    {
+        if (!$this->collaborator->contains($collaborator)) {
+            $this->collaborator[] = $collaborator;
+        }
+
+        return $this;
+    }
+
+    public function removeCollaborator(User $collaborator): self
+    {
+        if ($this->collaborator->contains($collaborator)) {
+            $this->collaborator->removeElement($collaborator);
         }
 
         return $this;

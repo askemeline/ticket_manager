@@ -58,10 +58,16 @@ class User implements UserInterface
      */
     private $author;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Article", mappedBy="collaborator")
+     */
+    private $collaborator;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection();
         $this->author = new ArrayCollection();
+        $this->collaborator = new ArrayCollection();
     }
 
 
@@ -218,6 +224,34 @@ class User implements UserInterface
             if ($author->getUser() === $this) {
                 $author->setUser(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Article[]
+     */
+    public function getCollaborator(): Collection
+    {
+        return $this->collaborator;
+    }
+
+    public function addCollaborator(Article $collaborator): self
+    {
+        if (!$this->collaborator->contains($collaborator)) {
+            $this->collaborator[] = $collaborator;
+            $collaborator->addCollaborator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCollaborator(Article $collaborator): self
+    {
+        if ($this->collaborator->contains($collaborator)) {
+            $this->collaborator->removeElement($collaborator);
+            $collaborator->removeCollaborator($this);
         }
 
         return $this;
